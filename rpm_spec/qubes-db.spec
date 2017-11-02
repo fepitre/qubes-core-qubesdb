@@ -27,6 +27,8 @@
 
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
+%define debug_package %{nil}
+
 Name:		qubes-db
 Version:	%{version}
 Release:	1%{?dist}
