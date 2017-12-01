@@ -1,0 +1,11 @@
+#!/sbin/openrc-run
+
+start() {
+    ebegin 'Starting qubesdb-daemon'
+    start-stop-daemon --start --pidfile /run/qubes/qubesdb.pid --exec /usr/sbin/qubesdb-daemon -- 0
+}
+
+stop() {
+    ebegin 'Stopping qubesdb-daemon'
+    start-stop-daemon --stop --pidfile /run/qubes/qubesdb.pid
+}

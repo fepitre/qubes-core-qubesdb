@@ -10,7 +10,7 @@ MY_PV=${PV/_/-}
 MY_P=${PN}-${MY_PV}
 
 KEYWORDS="amd64"
-EGIT_REPO_URI="https://github.com/QubesOS/qubes-core-qubesdb.git"
+EGIT_REPO_URI="https://github.com/fepitre/qubes-core-qubesdb.git"
 EGIT_COMMIT="v${PV}"
 DESCRIPTION="QubesOS libvchan cross-domain communication library"
 HOMEPAGE="http://www.qubes-os.org"
@@ -24,21 +24,32 @@ RDEPEND=""
 PDEPEND=""
 
 src_prepare() {
-	einfo "Apply patch set"
+    einfo "Apply patch set"
     EPATCH_SUFFIX="patch" \
     EPATCH_FORCE="yes" \
     EPATCH_OPTS="-p1" \
     epatch "${FILESDIR}"
 
-	default
+    default
 }
 
 src_compile() {
+    myopt="${myopt} DESTDIR="{D}" SYSTEMD=0 BACKEND_VMM=xen"
+
     # Build all with python2 bindings
-    PYTHON=python2 emake all
+    emake PYTHON=python2 ${myopt} all
+
+    # Build python3 bindings
+    emake -C python
 }
 
 src_install() {
     # Install all with python2 bindings
-    PYTHON=python2 make install DESTDIR=$pkgdir LIBDIR=/usr/lib BINDIR=/usr/bin SBINDIR=/usr/bin
+    emake PYTHON=python2 ${myopt} install
+
+    # Install python3 bindings
+    emake -C python install
+
+    newinitd "${FILESDIR}"/qubesdb-daemon.initd qubesdb-daemon
+    newconfd "${FILESDIR}"/qubesdb-daemon.confd qubesdb-daemon
 }

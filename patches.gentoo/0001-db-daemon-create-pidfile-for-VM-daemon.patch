@@ -1,0 +1,61 @@
+From 1b935d3bd604cc92daeb6e340e9dd3a51f9492f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret?= <frederic.epitre@orange.fr>
+Date: Fri, 1 Dec 2017 11:21:03 +0100
+Subject: [PATCH 1/3] db-daemon: create pidfile for VM daemon
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+---
+ daemon/db-daemon.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/daemon/db-daemon.c b/daemon/db-daemon.c
+index 7c90c2f..47b4a13 100644
+--- a/daemon/db-daemon.c
++++ b/daemon/db-daemon.c
+@@ -576,11 +576,15 @@ int create_pidfile(struct db_daemon_data *d) {
+     mode_t old_umask;
+     struct stat stat_buf;
+ 
+-    /* do not create pidfile for VM daemon - service is managed by systemd */
+-    if (!d->remote_name)
+-        return 1;
+-    snprintf(pidfile_name, sizeof(pidfile_name),
+-            "/var/run/qubes/qubesdb.%s.pid", d->remote_name);
++    if (!d->remote_name) {
++        /* create pidfile for VM daemon if service is not managed by systemd */
++        snprintf(pidfile_name, sizeof(pidfile_name),
++            "/var/run/qubes/qubesdb.pid");
++    } else {
++        /* do not create pidfile for VM daemon - service is managed by systemd */
++        snprintf(pidfile_name, sizeof(pidfile_name),
++                "/var/run/qubes/qubesdb.%s.pid", d->remote_name);
++    }
+ 
+     old_umask = umask(0002);
+     pidfile = fopen(pidfile_name, "w");
+@@ -600,11 +604,15 @@ void remove_pidfile(struct db_daemon_data *d) {
+     char pidfile_name[256];
+     struct stat stat_buf;
+ 
+-    /* no pidfile for VM daemon - service is managed by systemd */
+-    if (!d->remote_name)
+-        return;
+-    snprintf(pidfile_name, sizeof(pidfile_name),
++    if (!d->remote_name) {
++        /* create pidfile for VM daemon if service is not managed by systemd */
++        snprintf(pidfile_name, sizeof(pidfile_name),
++            "/var/run/qubes/qubesdb.pid");
++    } else {
++        /* dot not pidfile for VM daemon - service is managed by systemd */
++        snprintf(pidfile_name, sizeof(pidfile_name),
+             "/var/run/qubes/qubesdb.%s.pid", d->remote_name);
++    }
+ 
+     if (stat(pidfile_name, &stat_buf) == 0) {
+         /* remove pidfile only if it's the one created this process */
+-- 
+2.13.6
+

@@ -1,0 +1,33 @@
+From 5eb98329046b56b90391d6e7aa2a2800d428b994 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret?= <frederic.epitre@orange.fr>
+Date: Fri, 1 Dec 2017 11:33:06 +0100
+Subject: [PATCH 2/3] db-daemon: create logfile for VM daemon
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+---
+ daemon/db-daemon.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/daemon/db-daemon.c b/daemon/db-daemon.c
+index 47b4a13..22dc1a6 100644
+--- a/daemon/db-daemon.c
++++ b/daemon/db-daemon.c
+@@ -709,7 +709,11 @@ int main(int argc, char **argv) {
+                 exit(1);
+             case 0:
+                 close(ready_pipe[0]);
+-                snprintf(log_path, sizeof(log_path), "/var/log/qubes/qubesdb.%s.log", d.remote_name);
++                if (d.remote_name) {
++                    snprintf(log_path, sizeof(log_path), "/var/log/qubes/qubesdb.%s.log", d.remote_name);
++                } else {
++                    snprintf(log_path, sizeof(log_path), "/var/log/qubes/qubesdb.log");
++                }
+ 
+                 close(0);
+                 old_umask = umask(0);
+-- 
+2.13.6
+
