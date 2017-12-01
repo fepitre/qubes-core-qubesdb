@@ -11,6 +11,7 @@ else ifeq ($(PACKAGE_SET),vm)
 
   RPM_SPEC_FILES += rpm_spec/qubes-db-vm.spec
   ARCH_BUILD_DIRS := archlinux
+  GENTOO_BUILD_DIRS := gentoo
 endif
 
 ifeq ($(PACKAGE_SET),vm)
