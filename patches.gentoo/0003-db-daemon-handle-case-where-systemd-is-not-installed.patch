@@ -1,0 +1,75 @@
+From 9963f7793e87bf271198227b300295124d189f88 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret?= <frederic.epitre@orange.fr>
+Date: Fri, 1 Dec 2017 11:56:57 +0100
+Subject: [PATCH 3/3] db-daemon: handle case where systemd is not installed by
+ default (Gentoo)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+---
+ daemon/Makefile    |  6 +++++-
+ daemon/db-daemon.c | 10 +++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/daemon/Makefile b/daemon/Makefile
+index 9571114..c14ad72 100644
+--- a/daemon/Makefile
++++ b/daemon/Makefile
+@@ -2,11 +2,15 @@
+ CFLAGS += -I../include -I. -g -Wall -Werror -pie
+ EXEEXT =
+ 
++SYSTEMD ?= 1
++
+ ifneq ($(OS),Windows_NT)
+ CFLAGS += -fPIC -O2
++ifeq ($(SYSTEMD),1)
+ CFLAGS += `pkg-config --cflags libsystemd || pkg-config --cflags libsystemd-daemon`
+-CFLAGS += `pkg-config --cflags vchan-$(BACKEND_VMM)`
+ LIBS += `pkg-config --libs libsystemd || pkg-config --libs libsystemd-daemon`
++endif
++CFLAGS += `pkg-config --cflags vchan-$(BACKEND_VMM)`
+ LIBS += `pkg-config --libs vchan-$(BACKEND_VMM)`
+ 
+ else # Windows_NT
+diff --git a/daemon/db-daemon.c b/daemon/db-daemon.c
+index 22dc1a6..136aa4d 100644
+--- a/daemon/db-daemon.c
++++ b/daemon/db-daemon.c
+@@ -24,12 +24,16 @@
+ #endif
+ 
+ #ifndef WIN32
++/* Gentoo does not use systemd by default
++ */
++#ifdef SYSTEMD
+ /* For now link with systemd unconditionaly (all Fedora versions are using it,
+  * Archlinux also). But if someone needs no systemd in dependencies,
+  * it can be easily turned off, check the code in main() - conditions on
+  * getenv("NOTIFY_SOCKET").
+  */
+ #include <systemd/sd-daemon.h>
++#endif
+ #else // !WIN32
+ // parameters for a client pipe thread
+ struct thread_param {
+@@ -799,9 +803,13 @@ int main(int argc, char **argv) {
+ 
+     /* now ready for serving requests, notify parent */
+     /* FIXME: OS dependent code */
++#ifdef SYSTEMD
+     if (getenv("NOTIFY_SOCKET")) {
+         sd_notify(1, "READY=1");
+-    } else {
++    }
++    else
++#endif
++    {
+         if (write(ready_pipe[1], "ready", strlen("ready")) != strlen("ready"))
+             perror("failed to notify parent");
+         close(ready_pipe[1]);
+-- 
+2.13.6
+

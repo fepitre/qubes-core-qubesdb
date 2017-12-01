@@ -1,0 +1,25 @@
+From 10985af90defe164add1f04bac16283ee9d27bba Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret?= <frederic.epitre@orange.fr>
+Date: Fri, 1 Dec 2017 17:10:26 +0100
+Subject: [PATCH] libqubesdb: fix missing Shared Object Name
+
+---
+ client/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/Makefile b/client/Makefile
+index e02b638..f83575a 100644
+--- a/client/Makefile
++++ b/client/Makefile
+@@ -24,7 +24,7 @@ install: all
+ libqubesdb: libqubesdb.so
+ 
+ libqubesdb.so: qdb-client.o
+-	$(CC) $(LDFLAGS) -shared -o $@ $^ $(APPEND_LDFLAGS)
++	$(CC) $(LDFLAGS) -shared -o $@ $^ $(APPEND_LDFLAGS) -Wl,-soname,libqubesdb.so.0
+ 
+ libqubesdb.dll: qdb-client.o
+ 	$(CC) -shared -o $@ $^ -Wl,--output-def,libqubesdb.def,--out-implib,libqubesdb.dll.a
+-- 
+2.13.6
+
