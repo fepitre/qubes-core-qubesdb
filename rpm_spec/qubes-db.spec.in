@@ -28,7 +28,7 @@
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 Name:		qubes-db
-Version:	%{version}
+Version:	@VERSION@
 Release:	1%{?dist}
 Summary:	QubesDB tools
 
