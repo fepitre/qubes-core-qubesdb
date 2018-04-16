@@ -84,7 +84,7 @@ struct qubesdb_entry *qubesdb_insert(struct qubesdb *db, char *path) {
         /* entry already exists */
         return entry;
     } else {
-        new_entry = malloc(sizeof(*new_entry));
+        new_entry = calloc(1,sizeof(*new_entry));
         if (!new_entry)
             return NULL;
 #ifndef WIN32
@@ -153,7 +153,7 @@ int qubesdb_add_watch(struct qubesdb *db, char *path,
         struct client *client) {
     struct qubesdb_watch *new_watch;
 
-    new_watch = malloc(sizeof(*new_watch));
+    new_watch = calloc(1,sizeof(*new_watch));
     if (!new_watch) {
         return 0;
     }
@@ -214,6 +214,7 @@ int qubesdb_fire_watches(struct qubesdb *db, char *path) {
             hdr.type = QDB_RESP_WATCH;
 #ifndef WIN32
             strncpy(hdr.path, path, sizeof(hdr.path) - 1);
+            hdr.path[sizeof(hdr.path) - 1] = '\0';
 #else
             StringCbCopyA(hdr.path, sizeof(hdr.path), path);
 #endif
