@@ -21,6 +21,8 @@ clean:
 	$(MAKE) -C daemon clean
 	$(MAKE) -C client clean
 	$(MAKE) -C python clean
+	rm -rf debian/changelog.*
+	rm -rf pkgs
 
 install:
 	$(MAKE) -C daemon install

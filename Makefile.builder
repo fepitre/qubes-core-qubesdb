@@ -1,3 +1,4 @@
+NAME := qubes-db
 RPM_SPEC_FILES := rpm_spec/qubes-db.spec
 
 ifeq ($(PACKAGE_SET),dom0)
@@ -6,7 +7,6 @@ ifeq ($(PACKAGE_SET),dom0)
 else ifeq ($(PACKAGE_SET),vm)
   ifneq ($(filter $(DISTRIBUTION), debian qubuntu),)
     DEBIAN_BUILD_DIRS := debian
-    SOURCE_COPY_IN := source-debian-quilt-copy-in
   endif
 
   RPM_SPEC_FILES += rpm_spec/qubes-db-vm.spec
@@ -22,8 +22,5 @@ ifeq ($(PACKAGE_SET),vm)
   WIN_BUILD_DEPS = core-vchan-$(BACKEND_VMM) windows-utils
   WIN_PREBUILD_CMD = set_version.bat && powershell -executionpolicy bypass -File set_version.ps1 < nul
 endif
-
-source-debian-quilt-copy-in:
-	$(shell $(ORIG_SRC)/debian-quilt $(ORIG_SRC)/series-debian-vm.conf $(CHROOT_DIR)/$(DIST_SRC)/debian/patches)
 
 # vim: filetype=make
