@@ -11,6 +11,7 @@ else ifeq ($(PACKAGE_SET),vm)
 
   RPM_SPEC_FILES += rpm_spec/qubes-db-vm.spec
   ARCH_BUILD_DIRS := archlinux
+  EBUILD_FILES := gentoo/qubes-db.ebuild
 endif
 
 ifeq ($(PACKAGE_SET),vm)
